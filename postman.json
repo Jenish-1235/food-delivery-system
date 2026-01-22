@@ -1,0 +1,9 @@
+{
+    "collection": {
+        "info": {
+            "name": "Food Delivery System",
+            "description": "API documentation for the Food Delivery System",
+            "version": "1.0.0"
+        }
+    }
+}
