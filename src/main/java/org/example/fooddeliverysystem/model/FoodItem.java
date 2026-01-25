@@ -1,6 +1,5 @@
 package org.example.fooddeliverysystem.model;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -13,8 +12,10 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -27,9 +28,10 @@ public class FoodItem {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     
-    @Column(nullable = false)
-    @NotBlank(message = "Restaurant ID is required")
-    private String restaurantId;
+    @ManyToOne
+    @JoinColumn(name = "restaurant_id", nullable = false)
+    @NotNull(message = "Restaurant is required")
+    private Restaurant restaurant;
     
     @Column(nullable = false)
     @NotBlank(message = "Name is required")
@@ -39,16 +41,19 @@ public class FoodItem {
     
     private String imgUrl;
     
-    @Column(nullable = false, precision = 19, scale = 2)
+    @Column(nullable = false)
     @NotNull(message = "Price is required")
-    @DecimalMin(value = "0.01", message = "Price must be at least 0.01")
-    private BigDecimal price;
+    @Min(value = 0, message = "Price must be non-negative")
+    private Double price;
     
     @Column(nullable = false)
     private boolean isAvailable = true;
     
     @Column(nullable = false)
     private boolean isDeleted = false;
+    
+    @Column(columnDefinition = "jsonb")
+    private String metadata;
     
     @CreatedDate
     private LocalDateTime createdAt;
@@ -58,15 +63,15 @@ public class FoodItem {
 
     public FoodItem() {}
 
-    public FoodItem(String restaurantId, String name, BigDecimal price) {
-        this.restaurantId = restaurantId;
+    public FoodItem(Restaurant restaurant, String name, Double price) {
+        this.restaurant = restaurant;
         this.name = name;
         this.price = price;
     }
 
-    public FoodItem(String restaurantId, String name, String description, String imgUrl, 
-                   BigDecimal price, boolean isAvailable) {
-        this.restaurantId = restaurantId;
+    public FoodItem(Restaurant restaurant, String name, String description, String imgUrl, 
+                   Double price, boolean isAvailable) {
+        this.restaurant = restaurant;
         this.name = name;
         this.description = description;
         this.imgUrl = imgUrl;
@@ -82,12 +87,12 @@ public class FoodItem {
         this.id = id;
     }
 
-    public String getRestaurantId() {
-        return restaurantId;
+    public Restaurant getRestaurant() {
+        return restaurant;
     }
 
-    public void setRestaurantId(String restaurantId) {
-        this.restaurantId = restaurantId;
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
     }
 
     public String getName() {
@@ -114,11 +119,11 @@ public class FoodItem {
         this.imgUrl = imgUrl;
     }
 
-    public BigDecimal getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
@@ -136,6 +141,14 @@ public class FoodItem {
 
     public void setDeleted(boolean isDeleted) {
         this.isDeleted = isDeleted;
+    }
+
+    public String getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(String metadata) {
+        this.metadata = metadata;
     }
 
     public LocalDateTime getCreatedAt() {
