@@ -14,9 +14,12 @@ import org.example.fooddeliverysystem.model.Order;
 import org.example.fooddeliverysystem.model.Restaurant;
 import org.example.fooddeliverysystem.model.User;
 import org.example.fooddeliverysystem.repository.FoodItemRepository;
+import org.example.fooddeliverysystem.dto.event.OrderEvent;
 import org.example.fooddeliverysystem.repository.OrderRepository;
 import org.example.fooddeliverysystem.repository.RestaurantRepository;
 import org.example.fooddeliverysystem.repository.UserRepository;
+import org.example.fooddeliverysystem.service.KafkaEventProducer;
+import org.example.fooddeliverysystem.service.MetricsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,17 +37,23 @@ public class OrderService {
     private final RestaurantRepository restaurantRepository;
     private final FoodItemRepository foodItemRepository;
     private final ObjectMapper objectMapper;
+    private final MetricsService metricsService;
+    private final KafkaEventProducer kafkaEventProducer;
     
     public OrderService(OrderRepository orderRepository,
                        UserRepository userRepository,
                        RestaurantRepository restaurantRepository,
                        FoodItemRepository foodItemRepository,
-                       ObjectMapper objectMapper) {
+                       ObjectMapper objectMapper,
+                       MetricsService metricsService,
+                       KafkaEventProducer kafkaEventProducer) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.restaurantRepository = restaurantRepository;
         this.foodItemRepository = foodItemRepository;
         this.objectMapper = objectMapper;
+        this.metricsService = metricsService;
+        this.kafkaEventProducer = kafkaEventProducer;
     }
     
     @Transactional
@@ -108,14 +117,41 @@ public class OrderService {
         
         validateStatusTransition(order.getOrderStatus(), newStatus);
         
+        OrderStatus oldStatus = order.getOrderStatus();
         order.setOrderStatus(newStatus);
         
         if (newStatus == OrderStatus.DELIVERED) {
             order.setDeliveredAt(LocalDateTime.now());
+            
+            // Track delivery metrics
+            metricsService.incrementOrdersDelivered();
+            if (order.getCreatedAt() != null) {
+                long deliveryTimeMs = java.time.Duration.between(order.getCreatedAt(), LocalDateTime.now()).toMillis();
+                metricsService.recordDeliveryTime(deliveryTimeMs);
+            }
+        }
+        
+        if (newStatus == OrderStatus.CANCELLED) {
+            metricsService.incrementOrdersCancelled();
         }
         
         order = orderRepository.save(order);
-        return mapToResponse(order);
+        OrderResponse response = mapToResponse(order);
+        
+        // Publish order status change event
+        OrderEvent event = new OrderEvent(
+            "ORDER_STATUS_CHANGED",
+            order.getId(),
+            order.getOrderNumber(),
+            order.getUser().getId(),
+            order.getRestaurant().getId(),
+            order.getOrderStatus().name(),
+            order.getAmount()
+        );
+        event.setDriverId(order.getDriver() != null ? order.getDriver().getId() : null);
+        kafkaEventProducer.publishOrderEvent(event);
+        
+        return response;
     }
     
     private Double calculateOrderTotal(List<OrderItemRequest> items, String restaurantId) {
