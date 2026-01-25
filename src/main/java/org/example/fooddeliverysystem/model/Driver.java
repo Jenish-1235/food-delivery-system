@@ -12,6 +12,8 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,9 +27,10 @@ public class Driver {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     
-    @Column(unique = true, nullable = false)
-    @NotBlank(message = "User ID is required")
-    private String userId;
+    @OneToOne
+    @JoinColumn(name = "user_id", unique = true, nullable = false)
+    @NotNull(message = "User is required")
+    private User user;
     
     @Column(nullable = false)
     @NotBlank(message = "License number is required")
@@ -36,17 +39,12 @@ public class Driver {
     @Column(nullable = false)
     @NotBlank(message = "Vehicle number is required")
     private String vehicleNumber;
-    
+   
     @Column(nullable = false)
-    private boolean isAvailable = true;
+    private boolean onLeave = false;
     
-    @Column(nullable = false)
-    @NotNull(message = "Current latitude is required")
-    private Double currentLatitude;
-    
-    @Column(nullable = false)
-    @NotNull(message = "Current longitude is required")
-    private Double currentLongitude;
+    @Column(columnDefinition = "jsonb")
+    private String metadata;
     
     @CreatedDate
     private LocalDateTime createdAt;
@@ -56,23 +54,17 @@ public class Driver {
 
     public Driver() {}
 
-    public Driver(String userId, String licenseNumber, String vehicleNumber, 
-                 Double currentLatitude, Double currentLongitude) {
-        this.userId = userId;
+    public Driver(User user, String licenseNumber, String vehicleNumber) {
+        this.user = user;
         this.licenseNumber = licenseNumber;
         this.vehicleNumber = vehicleNumber;
-        this.currentLatitude = currentLatitude;
-        this.currentLongitude = currentLongitude;
     }
 
-    public Driver(String userId, String licenseNumber, String vehicleNumber, 
-                 boolean isAvailable, Double currentLatitude, Double currentLongitude) {
-        this.userId = userId;
+    public Driver(User user, String licenseNumber, String vehicleNumber, boolean onLeave) {
+        this.user = user;
         this.licenseNumber = licenseNumber;
         this.vehicleNumber = vehicleNumber;
-        this.isAvailable = isAvailable;
-        this.currentLatitude = currentLatitude;
-        this.currentLongitude = currentLongitude;
+        this.onLeave = onLeave;
     }
 
     public String getId() {
@@ -83,12 +75,12 @@ public class Driver {
         this.id = id;
     }
 
-    public String getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getLicenseNumber() {
@@ -107,28 +99,20 @@ public class Driver {
         this.vehicleNumber = vehicleNumber;
     }
 
-    public boolean isAvailable() {
-        return isAvailable;
+    public boolean isOnLeave() {
+        return onLeave;
     }
 
-    public void setAvailable(boolean isAvailable) {
-        this.isAvailable = isAvailable;
+    public void setOnLeave(boolean onLeave) {
+        this.onLeave = onLeave;
     }
 
-    public Double getCurrentLatitude() {
-        return currentLatitude;
+    public String getMetadata() {
+        return metadata;
     }
 
-    public void setCurrentLatitude(Double currentLatitude) {
-        this.currentLatitude = currentLatitude;
-    }
-
-    public Double getCurrentLongitude() {
-        return currentLongitude;
-    }
-
-    public void setCurrentLongitude(Double currentLongitude) {
-        this.currentLongitude = currentLongitude;
+    public void setMetadata(String metadata) {
+        this.metadata = metadata;
     }
 
     public LocalDateTime getCreatedAt() {
