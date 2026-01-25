@@ -26,6 +26,15 @@ public class MetricsService {
     private final Timer orderProcessingTime;
     private final Timer deliveryTime;
     
+    // Business metrics counters
+    private final Counter revenueCounter;
+    private final Counter restaurantOrdersCounter;
+    private final Counter driverDeliveriesCounter;
+    
+    // Gauges for business metrics
+    private final AtomicInteger totalOrders = new AtomicInteger(0);
+    private final AtomicInteger totalRevenue = new AtomicInteger(0);
+    
     public MetricsService(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
         
@@ -66,6 +75,28 @@ public class MetricsService {
         
         Gauge.builder("restaurants.active", activeRestaurants, AtomicInteger::get)
             .description("Number of active restaurants")
+            .register(meterRegistry);
+        
+        // Initialize business metrics counters
+        this.revenueCounter = Counter.builder("revenue.total")
+            .description("Total revenue from orders")
+            .register(meterRegistry);
+        
+        this.restaurantOrdersCounter = Counter.builder("restaurant.orders.total")
+            .description("Total orders per restaurant")
+            .register(meterRegistry);
+        
+        this.driverDeliveriesCounter = Counter.builder("driver.deliveries.total")
+            .description("Total deliveries per driver")
+            .register(meterRegistry);
+        
+        // Initialize business gauges
+        Gauge.builder("orders.total", totalOrders, AtomicInteger::get)
+            .description("Total number of orders")
+            .register(meterRegistry);
+        
+        Gauge.builder("revenue.total.amount", totalRevenue, AtomicInteger::get)
+            .description("Total revenue amount")
             .register(meterRegistry);
     }
     
@@ -119,5 +150,28 @@ public class MetricsService {
     
     public void decrementActiveRestaurants() {
         activeRestaurants.decrementAndGet();
+    }
+    
+    public void recordRevenue(Double amount) {
+        if (amount != null && amount > 0) {
+            revenueCounter.increment(amount);
+            totalRevenue.addAndGet(amount.intValue());
+        }
+    }
+    
+    public void incrementRestaurantOrders(String restaurantId) {
+        restaurantOrdersCounter.increment();
+    }
+    
+    public void incrementDriverDeliveries(String driverId) {
+        driverDeliveriesCounter.increment();
+    }
+    
+    public void incrementTotalOrders() {
+        totalOrders.incrementAndGet();
+    }
+    
+    public void setTotalOrders(int count) {
+        totalOrders.set(count);
     }
 }
