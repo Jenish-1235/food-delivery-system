@@ -3,6 +3,7 @@ package org.example.fooddeliverysystem.filter;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.BucketConfiguration;
 import io.github.bucket4j.distributed.proxy.ProxyManager;
+import java.nio.charset.StandardCharsets;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,7 +45,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         
         // Get or create bucket for this client
         Bucket bucket = proxyManager.builder()
-            .build(clientId, () -> bucketConfiguration);
+            .build(clientId.getBytes(StandardCharsets.UTF_8), () -> bucketConfiguration);
         
         // Try to consume a token
         if (bucket.tryConsume(1)) {
