@@ -20,10 +20,10 @@ import java.time.Duration;
 @Order(1)
 public class RateLimitingFilter extends OncePerRequestFilter {
     
-    private final ProxyManager<String> proxyManager;
+    private final ProxyManager<byte[]> proxyManager;
     private final BucketConfiguration bucketConfiguration;
     
-    public RateLimitingFilter(ProxyManager<String> proxyManager, BucketConfiguration bucketConfiguration) {
+    public RateLimitingFilter(ProxyManager<byte[]> proxyManager, BucketConfiguration bucketConfiguration) {
         this.proxyManager = proxyManager;
         this.bucketConfiguration = bucketConfiguration;
     }
