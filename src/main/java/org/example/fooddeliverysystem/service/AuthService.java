@@ -4,6 +4,9 @@ import org.example.fooddeliverysystem.dto.auth.AuthResponse;
 import org.example.fooddeliverysystem.dto.auth.LoginRequest;
 import org.example.fooddeliverysystem.dto.auth.RegisterRequest;
 import org.example.fooddeliverysystem.enums.Role;
+import org.example.fooddeliverysystem.exception.BusinessException;
+import org.example.fooddeliverysystem.exception.ConflictException;
+import org.example.fooddeliverysystem.exception.UnauthorizedException;
 import org.example.fooddeliverysystem.model.User;
 import org.example.fooddeliverysystem.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,10 +31,10 @@ public class AuthService {
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new ConflictException("User", "email: " + request.getEmail());
         }
         if (userRepository.existsByPhoneNo(request.getPhoneNo())) {
-            throw new RuntimeException("Phone number already exists");
+            throw new ConflictException("User", "phone number: " + request.getPhoneNo());
         }
         
         User user = new User(
@@ -59,14 +62,14 @@ public class AuthService {
     
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmailOrPhoneNo(request.getIdentifier(), request.getIdentifier())
-            .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+            .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
         
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new UnauthorizedException("Invalid credentials");
         }
         
         if (!user.isEnabled()) {
-            throw new RuntimeException("Account is disabled");
+            throw new BusinessException("Account is disabled");
         }
         
         String token = jwtService.generateToken(user.getId(), user.getEmail(), user.getRole().name());
