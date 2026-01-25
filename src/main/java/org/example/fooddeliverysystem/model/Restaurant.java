@@ -13,6 +13,8 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -26,9 +28,10 @@ public class Restaurant {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     
-    @Column(unique = true, nullable = false)
-    @NotBlank(message = "User ID is required")
-    private String userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", unique = true, nullable = false)
+    @NotNull(message = "User is required")
+    private User user;
     
     @Column(nullable = false)
     @NotBlank(message = "Restaurant name is required")
@@ -74,9 +77,9 @@ public class Restaurant {
 
     public Restaurant() {}
 
-    public Restaurant(String userId, String restaurantName, String city, String state, 
+    public Restaurant(User user, String restaurantName, String city, String state, 
                      String zipCode, Double latitude, Double longitude) {
-        this.userId = userId;
+        this.user = user;
         this.restaurantName = restaurantName;
         this.city = city;
         this.state = state;
@@ -85,10 +88,10 @@ public class Restaurant {
         this.longitude = longitude;
     }
 
-    public Restaurant(String userId, String restaurantName, String city, String state, 
+    public Restaurant(User user, String restaurantName, String city, String state, 
                      String zipCode, Double latitude, Double longitude, LocalTime openingTime, 
                      LocalTime closingTime, String imgUrl, boolean isOpen, String metadata) {
-        this.userId = userId;
+        this.user = user;
         this.restaurantName = restaurantName;
         this.city = city;
         this.state = state;
@@ -110,12 +113,12 @@ public class Restaurant {
         this.id = id;
     }
 
-    public String getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getRestaurantName() {
