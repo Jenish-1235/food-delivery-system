@@ -111,6 +111,50 @@ public class OrderService {
     }
     
     @Transactional
+    public OrderResponse assignDriver(String orderId, String driverId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new ResourceNotFoundException("Order", orderId));
+        
+        if (order.getOrderStatus() != OrderStatus.READY) {
+            throw new BusinessException("Order must be READY before assigning a driver");
+        }
+        
+        // Driver assignment logic would go here
+        // For now, we'll just update the order status
+        order.setOrderStatus(OrderStatus.OUT_FOR_DELIVERY);
+        order = orderRepository.save(order);
+        
+        OrderResponse response = mapToResponse(order);
+        
+        // Publish event
+        OrderEvent event = new OrderEvent(
+            "DRIVER_ASSIGNED",
+            order.getId(),
+            order.getOrderNumber(),
+            order.getUser().getId(),
+            order.getRestaurant().getId(),
+            order.getOrderStatus().name(),
+            order.getAmount()
+        );
+        event.setDriverId(driverId);
+        kafkaEventProducer.publishOrderEvent(event);
+        
+        return response;
+    }
+    
+    public List<OrderResponse> findByRestaurant(Restaurant restaurant) {
+        return orderRepository.findByRestaurant(restaurant).stream()
+            .map(this::mapToResponse)
+            .collect(Collectors.toList());
+    }
+    
+    public List<OrderResponse> findByDriver(org.example.fooddeliverysystem.model.Driver driver) {
+        return orderRepository.findByDriver(driver).stream()
+            .map(this::mapToResponse)
+            .collect(Collectors.toList());
+    }
+    
+    @Transactional
     public OrderResponse updateStatus(String id, OrderStatus newStatus) {
         Order order = orderRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Order", id));

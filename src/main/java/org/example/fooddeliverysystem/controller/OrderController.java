@@ -79,4 +79,25 @@ public class OrderController {
         OrderResponse response = orderService.updateStatus(id, request.getOrderStatus());
         return ResponseEntity.ok(response);
     }
+    
+    @PutMapping("/{id}/assign-driver")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<OrderResponse> assignDriver(
+            @PathVariable String id,
+            @RequestParam String driverId) {
+        OrderResponse response = orderService.assignDriver(id, driverId);
+        return ResponseEntity.ok(response);
+    }
+    
+    @GetMapping("/history")
+    @PreAuthorize("hasAnyRole('USER', 'RESTAURANT', 'DELIVERY_PARTNER', 'ADMIN')")
+    public ResponseEntity<List<OrderResponse>> getOrderHistory() {
+        User currentUser = userService.getCurrentUser();
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        List<OrderResponse> orders = orderService.findByUser(currentUser);
+        return ResponseEntity.ok(orders);
+    }
 }
