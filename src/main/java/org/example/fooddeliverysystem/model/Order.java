@@ -1,6 +1,5 @@
 package org.example.fooddeliverysystem.model;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.example.fooddeliverysystem.enums.OrderStatus;
@@ -16,8 +15,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -34,15 +35,19 @@ public class Order {
     @NotBlank(message = "Order number is required")
     private String orderNumber;
     
-    @Column(nullable = false)
-    @NotBlank(message = "User ID is required")
-    private String userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    @NotNull(message = "User is required")
+    private User user;
     
-    @Column(nullable = false)
-    @NotBlank(message = "Restaurant ID is required")
-    private String restaurantId;
+    @ManyToOne
+    @JoinColumn(name = "restaurant_id", nullable = false)
+    @NotNull(message = "Restaurant is required")
+    private Restaurant restaurant;
     
-    private String driverId;
+    @ManyToOne
+    @JoinColumn(name = "driver_id")
+    private Driver driver;
     
     @Column(columnDefinition = "jsonb", nullable = false)
     @NotBlank(message = "Items JSON is required")
@@ -65,30 +70,31 @@ public class Order {
     @NotNull(message = "Longitude is required")
     private Double longitude;
     
-    @Column(nullable = false, precision = 19, scale = 2)
+    @Column(nullable = false)
     @NotNull(message = "Amount is required")
-    @DecimalMin(value = "0.01", message = "Amount must be at least 0.01")
-    private BigDecimal amount;
+    @Min(value = 0, message = "Amount must be non-negative")
+    private Double amount;
     
     @CreatedDate
     @Column(nullable = false)
     private LocalDateTime createdAt;
     
-    private LocalDateTime preparedAt;
-    
     private LocalDateTime deliveredAt;
     
     @LastModifiedDate
     private LocalDateTime updatedAt;
+    
+    @Column(columnDefinition = "jsonb")
+    private String metadata;
 
     public Order() {}
 
-    public Order(String orderNumber, String userId, String restaurantId, String itemsJson, 
+    public Order(String orderNumber, User user, Restaurant restaurant, String itemsJson, 
                 OrderStatus orderStatus, String address, Double latitude, Double longitude, 
-                BigDecimal amount) {
+                Double amount) {
         this.orderNumber = orderNumber;
-        this.userId = userId;
-        this.restaurantId = restaurantId;
+        this.user = user;
+        this.restaurant = restaurant;
         this.itemsJson = itemsJson;
         this.orderStatus = orderStatus;
         this.address = address;
@@ -113,28 +119,28 @@ public class Order {
         this.orderNumber = orderNumber;
     }
 
-    public String getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public String getRestaurantId() {
-        return restaurantId;
+    public Restaurant getRestaurant() {
+        return restaurant;
     }
 
-    public void setRestaurantId(String restaurantId) {
-        this.restaurantId = restaurantId;
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
     }
 
-    public String getDriverId() {
-        return driverId;
+    public Driver getDriver() {
+        return driver;
     }
 
-    public void setDriverId(String driverId) {
-        this.driverId = driverId;
+    public void setDriver(Driver driver) {
+        this.driver = driver;
     }
 
     public String getItemsJson() {
@@ -177,11 +183,11 @@ public class Order {
         this.longitude = longitude;
     }
 
-    public BigDecimal getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(BigDecimal amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 
@@ -191,14 +197,6 @@ public class Order {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getPreparedAt() {
-        return preparedAt;
-    }
-
-    public void setPreparedAt(LocalDateTime preparedAt) {
-        this.preparedAt = preparedAt;
     }
 
     public LocalDateTime getDeliveredAt() {
@@ -215,6 +213,14 @@ public class Order {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(String metadata) {
+        this.metadata = metadata;
     }
 }
 
