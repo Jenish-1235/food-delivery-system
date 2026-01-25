@@ -1,7 +1,12 @@
 package org.example.fooddeliverysystem.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.example.fooddeliverysystem.dto.event.OrderEvent;
 import org.example.fooddeliverysystem.dto.order.OrderItemRequest;
 import org.example.fooddeliverysystem.dto.order.OrderRequest;
 import org.example.fooddeliverysystem.dto.order.OrderResponse;
@@ -9,25 +14,21 @@ import org.example.fooddeliverysystem.enums.OrderStatus;
 import org.example.fooddeliverysystem.exception.BusinessException;
 import org.example.fooddeliverysystem.exception.ResourceNotFoundException;
 import org.example.fooddeliverysystem.exception.ValidationException;
+import org.example.fooddeliverysystem.model.Driver;
 import org.example.fooddeliverysystem.model.FoodItem;
 import org.example.fooddeliverysystem.model.Order;
 import org.example.fooddeliverysystem.model.Restaurant;
 import org.example.fooddeliverysystem.model.User;
+import org.example.fooddeliverysystem.repository.DriverRepository;
 import org.example.fooddeliverysystem.repository.FoodItemRepository;
-import org.example.fooddeliverysystem.dto.event.OrderEvent;
 import org.example.fooddeliverysystem.repository.OrderRepository;
 import org.example.fooddeliverysystem.repository.RestaurantRepository;
 import org.example.fooddeliverysystem.repository.UserRepository;
-import org.example.fooddeliverysystem.service.KafkaEventProducer;
-import org.example.fooddeliverysystem.service.MetricsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class OrderService {
@@ -36,6 +37,8 @@ public class OrderService {
     private final UserRepository userRepository;
     private final RestaurantRepository restaurantRepository;
     private final FoodItemRepository foodItemRepository;
+    private final DriverRepository driverRepository;
+    private final DriverLocationService driverLocationService;
     private final ObjectMapper objectMapper;
     private final MetricsService metricsService;
     private final KafkaEventProducer kafkaEventProducer;
@@ -44,6 +47,8 @@ public class OrderService {
                        UserRepository userRepository,
                        RestaurantRepository restaurantRepository,
                        FoodItemRepository foodItemRepository,
+                       DriverRepository driverRepository,
+                       DriverLocationService driverLocationService,
                        ObjectMapper objectMapper,
                        MetricsService metricsService,
                        KafkaEventProducer kafkaEventProducer) {
@@ -51,6 +56,8 @@ public class OrderService {
         this.userRepository = userRepository;
         this.restaurantRepository = restaurantRepository;
         this.foodItemRepository = foodItemRepository;
+        this.driverRepository = driverRepository;
+        this.driverLocationService = driverLocationService;
         this.objectMapper = objectMapper;
         this.metricsService = metricsService;
         this.kafkaEventProducer = kafkaEventProducer;
@@ -95,6 +102,24 @@ public class OrderService {
         );
         
         order = orderRepository.save(order);
+        
+        // Track metrics
+        metricsService.incrementTotalOrders();
+        metricsService.recordRevenue(order.getAmount());
+        metricsService.incrementRestaurantOrders(order.getRestaurant().getId());
+        
+        // Publish order created event
+        OrderEvent event = new OrderEvent(
+            "ORDER_CREATED",
+            order.getId(),
+            order.getOrderNumber(),
+            order.getUser().getId(),
+            order.getRestaurant().getId(),
+            order.getOrderStatus().name(),
+            order.getAmount()
+        );
+        kafkaEventProducer.publishOrderEvent(event);
+        
         return mapToResponse(order);
     }
     
@@ -119,10 +144,27 @@ public class OrderService {
             throw new BusinessException("Order must be READY before assigning a driver");
         }
         
-        // Driver assignment logic would go here
-        // For now, we'll just update the order status
+        // Fetch and validate driver
+        Driver driver = driverRepository.findById(driverId)
+            .orElseThrow(() -> new ResourceNotFoundException("Driver", driverId));
+        
+        // Check if driver is on leave
+        if (driver.isOnLeave()) {
+            throw new BusinessException("Driver is currently on leave and cannot be assigned");
+        }
+        
+        // Check if driver is available in cache
+        if (!driverLocationService.isDriverAvailable(driverId)) {
+            throw new BusinessException("Driver is not available for delivery");
+        }
+        
+        // Assign driver to order
+        order.setDriver(driver);
         order.setOrderStatus(OrderStatus.OUT_FOR_DELIVERY);
         order = orderRepository.save(order);
+        
+        // Track metrics
+        metricsService.incrementDriverDeliveries(driverId);
         
         OrderResponse response = mapToResponse(order);
         

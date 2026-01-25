@@ -1,23 +1,21 @@
 package org.example.fooddeliverysystem.service;
 
-import org.example.fooddeliverysystem.dto.driver.DriverLocationUpdateRequest;
-import org.example.fooddeliverysystem.dto.driver.DriverRequest;
-import org.example.fooddeliverysystem.dto.driver.DriverResponse;
-import org.example.fooddeliverysystem.exception.ResourceNotFoundException;
-import org.example.fooddeliverysystem.model.Driver;
-import org.example.fooddeliverysystem.model.User;
-import org.example.fooddeliverysystem.dto.event.AnalyticsEvent;
-import org.example.fooddeliverysystem.repository.DriverRepository;
-import org.example.fooddeliverysystem.repository.UserRepository;
-import org.example.fooddeliverysystem.service.KafkaEventProducer;
-import org.example.fooddeliverysystem.service.MetricsService;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.example.fooddeliverysystem.dto.driver.DriverLocationUpdateRequest;
+import org.example.fooddeliverysystem.dto.driver.DriverRequest;
+import org.example.fooddeliverysystem.dto.driver.DriverResponse;
+import org.example.fooddeliverysystem.dto.event.AnalyticsEvent;
+import org.example.fooddeliverysystem.exception.ResourceNotFoundException;
+import org.example.fooddeliverysystem.model.Driver;
+import org.example.fooddeliverysystem.model.User;
+import org.example.fooddeliverysystem.repository.DriverRepository;
+import org.example.fooddeliverysystem.repository.UserRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class DriverService {

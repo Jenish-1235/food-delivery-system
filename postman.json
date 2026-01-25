@@ -56,106 +56,9 @@
 								"register"
 							]
 						},
-						"description": "Register a new user in the system. Returns JWT token upon successful registration."
+						"description": "Register a new user in the system. Returns JWT token upon successful registration. Roles: USER, RESTAURANT, DELIVERY_PARTNER, ADMIN"
 					},
-					"response": [
-						{
-							"name": "Success Response",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/auth/register",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"auth",
-										"register"
-									]
-								},
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"phoneNo\": \"1234567890\",\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\",\n    \"name\": \"John Doe\",\n    \"address\": \"123 Main Street\",\n    \"role\": \"USER\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"tokenType\": \"Bearer\",\n    \"userId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"email\": \"user@example.com\",\n    \"phoneNo\": \"1234567890\",\n    \"name\": \"John Doe\",\n    \"role\": \"USER\"\n}"
-						},
-						{
-							"name": "Validation Error",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/auth/register",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"auth",
-										"register"
-									]
-								}
-							},
-							"status": "Bad Request",
-							"code": 400,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"timestamp\": \"2024-01-22T10:00:00Z\",\n    \"status\": 400,\n    \"error\": \"Bad Request\",\n    \"message\": \"Validation failed\",\n    \"path\": \"/api/auth/register\"\n}"
-						},
-						{
-							"name": "Duplicate Email",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/auth/register",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"auth",
-										"register"
-									]
-								}
-							},
-							"status": "Internal Server Error",
-							"code": 500,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"timestamp\": \"2024-01-22T10:00:00Z\",\n    \"status\": 500,\n    \"error\": \"Internal Server Error\",\n    \"message\": \"Email already exists\",\n    \"path\": \"/api/auth/register\"\n}"
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "Login User",
@@ -205,105 +108,32 @@
 						},
 						"description": "Login with email or phone number. Returns JWT token upon successful authentication."
 					},
-					"response": [
-						{
-							"name": "Success Response",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/auth/login",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"auth",
-										"login"
-									]
-								},
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"identifier\": \"user@example.com\",\n    \"password\": \"password123\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"tokenType\": \"Bearer\",\n    \"userId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"email\": \"user@example.com\",\n    \"phoneNo\": \"1234567890\",\n    \"name\": \"John Doe\",\n    \"role\": \"USER\"\n}"
-						},
-						{
-							"name": "Invalid Credentials",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/auth/login",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"auth",
-										"login"
-									]
-								}
-							},
-							"status": "Internal Server Error",
-							"code": 500,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"timestamp\": \"2024-01-22T10:00:00Z\",\n    \"status\": 500,\n    \"error\": \"Internal Server Error\",\n    \"message\": \"Invalid credentials\",\n    \"path\": \"/api/auth/login\"\n}"
-						}
-					]
-				},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints for user registration and login"
+		},
+		{
+			"name": "Restaurants",
+			"item": [
 				{
-					"name": "Login with Phone Number",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    const response = pm.response.json();",
-									"    pm.collectionVariables.set(\"accessToken\", response.accessToken);",
-									"    pm.collectionVariables.set(\"userId\", response.userId);",
-									"    console.log(\"Token saved: \", response.accessToken);",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
+					"name": "Create Restaurant",
 					"request": {
 						"method": "POST",
 						"header": [
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"identifier\": \"1234567890\",\n    \"password\": \"password123\"\n}",
+							"raw": "{\n    \"restaurantName\": \"Pizza Palace\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"zipCode\": \"10001\",\n    \"latitude\": 40.7128,\n    \"longitude\": -74.0060,\n    \"openingTime\": \"09:00:00\",\n    \"closingTime\": \"22:00:00\",\n    \"imgUrl\": \"https://example.com/pizza.jpg\",\n    \"isOpen\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -311,22 +141,892 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/auth/login",
+							"raw": "{{baseUrl}}/api/restaurants",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"auth",
-								"login"
+								"restaurants"
 							]
 						},
-						"description": "Login using phone number instead of email. The identifier field accepts both email and phone number."
+						"description": "Create a new restaurant. Requires RESTAURANT or ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Restaurant by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/restaurants/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"restaurants",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "Restaurant ID"
+								}
+							]
+						},
+						"description": "Get restaurant details by ID. Public endpoint."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Restaurant",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"restaurantName\": \"Pizza Palace Updated\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"zipCode\": \"10001\",\n    \"latitude\": 40.7128,\n    \"longitude\": -74.0060,\n    \"openingTime\": \"09:00:00\",\n    \"closingTime\": \"23:00:00\",\n    \"isOpen\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/restaurants/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"restaurants",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "Restaurant ID"
+								}
+							]
+						},
+						"description": "Update restaurant details. Requires RESTAURANT or ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Restaurants (Search & Filter)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/restaurants?city=New York&state=NY&isOpen=true&page=0&size=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"restaurants"
+							],
+							"query": [
+								{
+									"key": "city",
+									"value": "New York",
+									"description": "Filter by city",
+									"disabled": false
+								},
+								{
+									"key": "state",
+									"value": "NY",
+									"description": "Filter by state",
+									"disabled": false
+								},
+								{
+									"key": "isOpen",
+									"value": "true",
+									"description": "Filter by open status",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "0",
+									"description": "Page number (for pagination)",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "10",
+									"description": "Page size (for pagination)",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Search and filter restaurants. Supports city, state, isOpen filters and pagination."
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Restaurant",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/restaurants/my-restaurant",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"restaurants",
+								"my-restaurant"
+							]
+						},
+						"description": "Get the current user's restaurant. Requires RESTAURANT role."
 					},
 					"response": []
 				}
 			],
-			"description": "Authentication endpoints for user registration and login"
+			"description": "Restaurant management endpoints"
+		},
+		{
+			"name": "Food Items",
+			"item": [
+				{
+					"name": "Create Food Item",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Margherita Pizza\",\n    \"description\": \"Classic pizza with tomato and mozzarella\",\n    \"price\": 12.99,\n    \"imgUrl\": \"https://example.com/pizza.jpg\",\n    \"isAvailable\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/food-items?restaurantId=:restaurantId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"food-items"
+							],
+							"query": [
+								{
+									"key": "restaurantId",
+									"value": ":restaurantId",
+									"description": "Restaurant ID"
+								}
+							]
+						},
+						"description": "Create a new food item for a restaurant. Requires RESTAURANT or ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Food Item by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/food-items/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"food-items",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "Food Item ID"
+								}
+							]
+						},
+						"description": "Get food item details by ID. Public endpoint."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Food Item",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Margherita Pizza Updated\",\n    \"description\": \"Classic pizza with tomato and mozzarella\",\n    \"price\": 14.99,\n    \"isAvailable\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/food-items/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"food-items",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "Food Item ID"
+								}
+							]
+						},
+						"description": "Update food item details. Requires RESTAURANT or ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Food Item",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/food-items/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"food-items",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "Food Item ID"
+								}
+							]
+						},
+						"description": "Soft delete a food item. Requires RESTAURANT or ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Food Items by Restaurant",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/food-items/restaurants/:restaurantId?availableOnly=false",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"food-items",
+								"restaurants",
+								":restaurantId"
+							],
+							"query": [
+								{
+									"key": "availableOnly",
+									"value": "false",
+									"description": "Filter only available items",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "restaurantId",
+									"value": "",
+									"description": "Restaurant ID"
+								}
+							]
+						},
+						"description": "Get all food items for a restaurant. Public endpoint."
+					},
+					"response": []
+				}
+			],
+			"description": "Food item management endpoints"
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "Create Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"restaurantId\": \"restaurant-uuid-here\",\n    \"items\": [\n        {\n            \"foodItemId\": \"food-item-uuid-here\",\n            \"quantity\": 2\n        },\n        {\n            \"foodItemId\": \"food-item-uuid-2\",\n            \"quantity\": 1\n        }\n    ],\n    \"address\": \"123 Main Street, New York, NY 10001\",\n    \"latitude\": 40.7128,\n    \"longitude\": -74.0060\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"orders"
+							]
+						},
+						"description": "Create a new order. Requires USER or ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"orders",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "Order ID"
+								}
+							]
+						},
+						"description": "Get order details by ID. Requires USER, RESTAURANT, DELIVERY_PARTNER, or ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"orders"
+							]
+						},
+						"description": "Get all orders for the current user. Requires USER, RESTAURANT, DELIVERY_PARTNER, or ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Order Status",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderStatus\": \"PREPARING\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/:id/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"orders",
+								":id",
+								"status"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "Order ID"
+								}
+							]
+						},
+						"description": "Update order status. Valid statuses: PENDING, CONFIRMED, PREPARING, READY, OUT_FOR_DELIVERY, DELIVERED, CANCELLED. Requires RESTAURANT, DELIVERY_PARTNER, or ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Driver to Order",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/:id/assign-driver?driverId=:driverId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"orders",
+								":id",
+								"assign-driver"
+							],
+							"query": [
+								{
+									"key": "driverId",
+									"value": ":driverId",
+									"description": "Driver ID"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "Order ID"
+								}
+							]
+						},
+						"description": "Assign a driver to an order. Requires ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/history",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"orders",
+								"history"
+							]
+						},
+						"description": "Get order history for the current user. Requires USER, RESTAURANT, DELIVERY_PARTNER, or ADMIN role."
+					},
+					"response": []
+				}
+			],
+			"description": "Order management endpoints"
+		},
+		{
+			"name": "Drivers",
+			"item": [
+				{
+					"name": "Register Driver",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"licenseNumber\": \"DL123456789\",\n    \"vehicleNumber\": \"ABC-1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/drivers",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"drivers"
+							]
+						},
+						"description": "Register as a driver. Requires DELIVERY_PARTNER or ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Driver by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/drivers/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"drivers",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "Driver ID"
+								}
+							]
+						},
+						"description": "Get driver details by ID. Requires DELIVERY_PARTNER or ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Driver Location",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"latitude\": 40.7128,\n    \"longitude\": -74.0060\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/drivers/:id/location",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"drivers",
+								":id",
+								"location"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "Driver ID"
+								}
+							]
+						},
+						"description": "Update driver location. Stored in Redis cache. Requires DELIVERY_PARTNER or ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Set Driver Availability",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/drivers/:id/availability?available=true",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"drivers",
+								":id",
+								"availability"
+							],
+							"query": [
+								{
+									"key": "available",
+									"value": "true",
+									"description": "Availability status"
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "Driver ID"
+								}
+							]
+						},
+						"description": "Set driver availability. Stored in Redis cache. Requires DELIVERY_PARTNER or ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Available Drivers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/drivers/available",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"drivers",
+								"available"
+							]
+						},
+						"description": "Get all available drivers. Requires RESTAURANT or ADMIN role."
+					},
+					"response": []
+				}
+			],
+			"description": "Driver management endpoints"
+		},
+		{
+			"name": "Admin - Cache Management",
+			"item": [
+				{
+					"name": "Delete Cache Key",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/cache/:key",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"cache",
+								":key"
+							],
+							"variable": [
+								{
+									"key": "key",
+									"value": "",
+									"description": "Cache key to delete"
+								}
+							]
+						},
+						"description": "Delete a specific cache key. Requires ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Warm Up Cache",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/cache/warm-up",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"cache",
+								"warm-up"
+							]
+						},
+						"description": "Warm up the cache with frequently accessed data. Requires ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Evict Expired Cache Entries",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/cache/evict",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"cache",
+								"evict"
+							]
+						},
+						"description": "Evict expired cache entries. Requires ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cache Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/cache/statistics",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"cache",
+								"statistics"
+							]
+						},
+						"description": "Get cache statistics. Requires ADMIN role."
+					},
+					"response": []
+				}
+			],
+			"description": "Admin cache management endpoints"
 		},
 		{
 			"name": "Health & Monitoring",
@@ -348,36 +1048,7 @@
 						},
 						"description": "Check the health status of the application"
 					},
-					"response": [
-						{
-							"name": "Health Status",
-							"originalRequest": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/actuator/health",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"actuator",
-										"health"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"groups\": [\"liveness\", \"readiness\"],\n    \"status\": \"UP\"\n}"
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "Metrics",
@@ -419,26 +1090,6 @@
 				}
 			],
 			"description": "Health check and monitoring endpoints"
-		},
-		{
-			"name": "Restaurants",
-			"item": [],
-			"description": "Restaurant management endpoints (To be implemented)"
-		},
-		{
-			"name": "Orders",
-			"item": [],
-			"description": "Order management endpoints (To be implemented)"
-		},
-		{
-			"name": "Cart",
-			"item": [],
-			"description": "Shopping cart endpoints (To be implemented)"
-		},
-		{
-			"name": "Delivery",
-			"item": [],
-			"description": "Delivery tracking endpoints (To be implemented)"
 		}
 	],
 	"event": [
