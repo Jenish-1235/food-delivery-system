@@ -5,7 +5,6 @@ import org.example.fooddeliverysystem.dto.error.FieldError;
 import org.example.fooddeliverysystem.dto.error.ValidationErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError as SpringFieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -90,11 +89,12 @@ public class GlobalExceptionHandler {
         );
         
         ex.getBindingResult().getFieldErrors().forEach(springFieldError -> {
-            FieldError fieldError = new FieldError(
-                springFieldError.getField(),
-                springFieldError.getRejectedValue(),
-                springFieldError.getDefaultMessage()
-            );
+            org.example.fooddeliverysystem.dto.error.FieldError fieldError = 
+                new org.example.fooddeliverysystem.dto.error.FieldError(
+                    springFieldError.getField(),
+                    springFieldError.getRejectedValue(),
+                    springFieldError.getDefaultMessage()
+                );
             errorResponse.addFieldError(fieldError);
         });
         
