@@ -6,12 +6,17 @@ import org.example.fooddeliverysystem.dto.driver.DriverResponse;
 import org.example.fooddeliverysystem.exception.ResourceNotFoundException;
 import org.example.fooddeliverysystem.model.Driver;
 import org.example.fooddeliverysystem.model.User;
+import org.example.fooddeliverysystem.dto.event.AnalyticsEvent;
 import org.example.fooddeliverysystem.repository.DriverRepository;
 import org.example.fooddeliverysystem.repository.UserRepository;
+import org.example.fooddeliverysystem.service.KafkaEventProducer;
+import org.example.fooddeliverysystem.service.MetricsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,13 +25,19 @@ public class DriverService {
     private final DriverRepository driverRepository;
     private final UserRepository userRepository;
     private final DriverLocationService driverLocationService;
+    private final MetricsService metricsService;
+    private final KafkaEventProducer kafkaEventProducer;
     
     public DriverService(DriverRepository driverRepository,
                         UserRepository userRepository,
-                        DriverLocationService driverLocationService) {
+                        DriverLocationService driverLocationService,
+                        MetricsService metricsService,
+                        KafkaEventProducer kafkaEventProducer) {
         this.driverRepository = driverRepository;
         this.userRepository = userRepository;
         this.driverLocationService = driverLocationService;
+        this.metricsService = metricsService;
+        this.kafkaEventProducer = kafkaEventProducer;
     }
     
     @Transactional
@@ -42,6 +53,16 @@ public class DriverService {
         Driver driver = new Driver(user, request.getLicenseNumber(), request.getVehicleNumber());
         driver = driverRepository.save(driver);
         
+        // Track metrics
+        metricsService.incrementActiveDrivers();
+        
+        // Publish analytics event
+        Map<String, Object> metrics = new HashMap<>();
+        metrics.put("action", "driver_registered");
+        metrics.put("driverId", driver.getId());
+        AnalyticsEvent event = new AnalyticsEvent("DRIVER_REGISTERED", "DRIVER", driver.getId(), metrics);
+        kafkaEventProducer.publishAnalyticsEvent(event);
+        
         return mapToResponse(driver);
     }
     
@@ -53,6 +74,14 @@ public class DriverService {
     @Transactional
     public void setAvailability(String driverId, boolean available) {
         driverLocationService.setDriverAvailability(driverId, available);
+        
+        // Publish analytics event
+        Map<String, Object> metrics = new HashMap<>();
+        metrics.put("action", "driver_availability_changed");
+        metrics.put("driverId", driverId);
+        metrics.put("available", available);
+        AnalyticsEvent event = new AnalyticsEvent("DRIVER_AVAILABILITY_CHANGED", "DRIVER", driverId, metrics);
+        kafkaEventProducer.publishAnalyticsEvent(event);
     }
     
     public List<DriverResponse> findAvailableDrivers() {
