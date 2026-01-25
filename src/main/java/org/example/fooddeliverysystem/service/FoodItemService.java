@@ -6,13 +6,18 @@ import org.example.fooddeliverysystem.exception.BusinessException;
 import org.example.fooddeliverysystem.exception.ResourceNotFoundException;
 import org.example.fooddeliverysystem.model.FoodItem;
 import org.example.fooddeliverysystem.model.Restaurant;
+import org.example.fooddeliverysystem.dto.event.AnalyticsEvent;
 import org.example.fooddeliverysystem.repository.FoodItemRepository;
 import org.example.fooddeliverysystem.repository.RestaurantRepository;
+import org.example.fooddeliverysystem.service.KafkaEventProducer;
+import org.example.fooddeliverysystem.service.MetricsService;
 import org.example.fooddeliverysystem.util.CacheKeys;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -22,13 +27,19 @@ public class FoodItemService {
     private final FoodItemRepository foodItemRepository;
     private final RestaurantRepository restaurantRepository;
     private final CacheService cacheService;
+    private final MetricsService metricsService;
+    private final KafkaEventProducer kafkaEventProducer;
     
     public FoodItemService(FoodItemRepository foodItemRepository, 
                           RestaurantRepository restaurantRepository,
-                          CacheService cacheService) {
+                          CacheService cacheService,
+                          MetricsService metricsService,
+                          KafkaEventProducer kafkaEventProducer) {
         this.foodItemRepository = foodItemRepository;
         this.restaurantRepository = restaurantRepository;
         this.cacheService = cacheService;
+        this.metricsService = metricsService;
+        this.kafkaEventProducer = kafkaEventProducer;
     }
     
     @Transactional
@@ -50,6 +61,14 @@ public class FoodItemService {
         
         // Invalidate restaurant menu cache
         cacheService.delete(CacheKeys.restaurantMenuKey(restaurantId));
+        
+        // Publish analytics event
+        Map<String, Object> metrics = new HashMap<>();
+        metrics.put("action", "food_item_created");
+        metrics.put("foodItemId", foodItem.getId());
+        metrics.put("restaurantId", restaurantId);
+        AnalyticsEvent event = new AnalyticsEvent("FOOD_ITEM_CREATED", "FOOD_ITEM", foodItem.getId(), metrics);
+        kafkaEventProducer.publishAnalyticsEvent(event);
         
         return response;
     }
@@ -75,6 +94,14 @@ public class FoodItemService {
         // Invalidate restaurant menu cache
         cacheService.delete(CacheKeys.restaurantMenuKey(foodItem.getRestaurant().getId()));
         
+        // Publish analytics event
+        Map<String, Object> metrics = new HashMap<>();
+        metrics.put("action", "food_item_updated");
+        metrics.put("foodItemId", foodItem.getId());
+        metrics.put("restaurantId", foodItem.getRestaurant().getId());
+        AnalyticsEvent event = new AnalyticsEvent("FOOD_ITEM_UPDATED", "FOOD_ITEM", foodItem.getId(), metrics);
+        kafkaEventProducer.publishAnalyticsEvent(event);
+        
         return response;
     }
     
@@ -89,6 +116,14 @@ public class FoodItemService {
         
         // Invalidate restaurant menu cache
         cacheService.delete(CacheKeys.restaurantMenuKey(foodItem.getRestaurant().getId()));
+        
+        // Publish analytics event
+        Map<String, Object> metrics = new HashMap<>();
+        metrics.put("action", "food_item_deleted");
+        metrics.put("foodItemId", foodItem.getId());
+        metrics.put("restaurantId", foodItem.getRestaurant().getId());
+        AnalyticsEvent event = new AnalyticsEvent("FOOD_ITEM_DELETED", "FOOD_ITEM", foodItem.getId(), metrics);
+        kafkaEventProducer.publishAnalyticsEvent(event);
     }
     
     public FoodItemResponse findById(String id) {
