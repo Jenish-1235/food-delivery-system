@@ -8,12 +8,10 @@ import org.example.fooddeliverysystem.model.Driver;
 import org.example.fooddeliverysystem.model.User;
 import org.example.fooddeliverysystem.repository.DriverRepository;
 import org.example.fooddeliverysystem.repository.UserRepository;
-import org.example.fooddeliverysystem.util.CacheKeys;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,14 +19,14 @@ public class DriverService {
     
     private final DriverRepository driverRepository;
     private final UserRepository userRepository;
-    private final CacheService cacheService;
+    private final DriverLocationService driverLocationService;
     
     public DriverService(DriverRepository driverRepository,
                         UserRepository userRepository,
-                        CacheService cacheService) {
+                        DriverLocationService driverLocationService) {
         this.driverRepository = driverRepository;
         this.userRepository = userRepository;
-        this.cacheService = cacheService;
+        this.driverLocationService = driverLocationService;
     }
     
     @Transactional
@@ -49,33 +47,12 @@ public class DriverService {
     
     @Transactional
     public void updateLocation(String driverId, DriverLocationUpdateRequest request) {
-        Driver driver = driverRepository.findById(driverId)
-            .orElseThrow(() -> new ResourceNotFoundException("Driver", driverId));
-        
-        // Store location in cache (not in database as per design)
-        String locationKey = CacheKeys.driverLocationKey(driverId);
-        String locationValue = request.getLatitude() + "," + request.getLongitude();
-        cacheService.setStringWithExpiry(
-            locationKey,
-            locationValue,
-            CacheKeys.DRIVER_LOCATION_TTL,
-            TimeUnit.SECONDS
-        );
+        driverLocationService.updateDriverLocation(driverId, request);
     }
     
     @Transactional
     public void setAvailability(String driverId, boolean available) {
-        Driver driver = driverRepository.findById(driverId)
-            .orElseThrow(() -> new ResourceNotFoundException("Driver", driverId));
-        
-        // Store availability in cache (not in database as per design)
-        String availabilityKey = CacheKeys.driverAvailabilityKey(driverId);
-        cacheService.setStringWithExpiry(
-            availabilityKey,
-            String.valueOf(available),
-            CacheKeys.DRIVER_AVAILABILITY_TTL,
-            TimeUnit.SECONDS
-        );
+        driverLocationService.setDriverAvailability(driverId, available);
     }
     
     public List<DriverResponse> findAvailableDrivers() {
