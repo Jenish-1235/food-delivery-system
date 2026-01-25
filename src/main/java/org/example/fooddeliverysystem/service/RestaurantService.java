@@ -2,15 +2,20 @@ package org.example.fooddeliverysystem.service;
 
 import org.example.fooddeliverysystem.dto.restaurant.RestaurantRequest;
 import org.example.fooddeliverysystem.dto.restaurant.RestaurantResponse;
+import org.example.fooddeliverysystem.dto.event.AnalyticsEvent;
 import org.example.fooddeliverysystem.exception.ResourceNotFoundException;
 import org.example.fooddeliverysystem.model.Restaurant;
 import org.example.fooddeliverysystem.model.User;
 import org.example.fooddeliverysystem.repository.RestaurantRepository;
 import org.example.fooddeliverysystem.repository.UserRepository;
+import org.example.fooddeliverysystem.util.CacheKeys;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,11 +23,20 @@ public class RestaurantService {
     
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
+    private final CacheService cacheService;
+    private final MetricsService metricsService;
+    private final KafkaEventProducer kafkaEventProducer;
     
     public RestaurantService(RestaurantRepository restaurantRepository, 
-                            UserRepository userRepository) {
+                            UserRepository userRepository,
+                            CacheService cacheService,
+                            MetricsService metricsService,
+                            KafkaEventProducer kafkaEventProducer) {
         this.restaurantRepository = restaurantRepository;
         this.userRepository = userRepository;
+        this.cacheService = cacheService;
+        this.metricsService = metricsService;
+        this.kafkaEventProducer = kafkaEventProducer;
     }
     
     @Transactional
@@ -66,13 +80,47 @@ public class RestaurantService {
         restaurant.setOpen(request.isOpen());
         
         restaurant = restaurantRepository.save(restaurant);
-        return mapToResponse(restaurant);
+        RestaurantResponse response = mapToResponse(restaurant);
+        
+        // Update cache
+        cacheService.setWithExpiry(
+            CacheKeys.restaurantKey(restaurant.getId()),
+            response,
+            CacheKeys.RESTAURANT_TTL,
+            TimeUnit.SECONDS
+        );
+        
+        // Publish analytics event
+        Map<String, Object> metrics = new HashMap<>();
+        metrics.put("action", "restaurant_updated");
+        metrics.put("restaurantId", restaurant.getId());
+        AnalyticsEvent event = new AnalyticsEvent("RESTAURANT_UPDATED", "RESTAURANT", restaurant.getId(), metrics);
+        kafkaEventProducer.publishAnalyticsEvent(event);
+        
+        return response;
     }
     
     public RestaurantResponse findById(String id) {
+        // Try cache first
+        RestaurantResponse cached = cacheService.get(CacheKeys.restaurantKey(id), RestaurantResponse.class);
+        if (cached != null) {
+            return cached;
+        }
+        
+        // Cache miss - fetch from database
         Restaurant restaurant = restaurantRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Restaurant", id));
-        return mapToResponse(restaurant);
+        RestaurantResponse response = mapToResponse(restaurant);
+        
+        // Cache the response
+        cacheService.setWithExpiry(
+            CacheKeys.restaurantKey(id),
+            response,
+            CacheKeys.RESTAURANT_TTL,
+            TimeUnit.SECONDS
+        );
+        
+        return response;
     }
     
     public RestaurantResponse findByUser(User user) {
