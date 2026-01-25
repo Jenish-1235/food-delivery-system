@@ -9,6 +9,9 @@ import org.example.fooddeliverysystem.model.User;
 import org.example.fooddeliverysystem.repository.RestaurantRepository;
 import org.example.fooddeliverysystem.repository.UserRepository;
 import org.example.fooddeliverysystem.util.CacheKeys;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -139,6 +142,36 @@ public class RestaurantService {
         return restaurantRepository.findByCityAndState(city, state).stream()
             .map(this::mapToResponse)
             .collect(Collectors.toList());
+    }
+    
+    public List<RestaurantResponse> findByCityAndIsOpen(String city) {
+        return restaurantRepository.findByCityAndIsOpenTrue(city).stream()
+            .map(this::mapToResponse)
+            .collect(Collectors.toList());
+    }
+    
+    public List<RestaurantResponse> findByCityAndStateAndIsOpen(String city, String state) {
+        return restaurantRepository.findByCityAndStateAndIsOpenTrue(city, state).stream()
+            .map(this::mapToResponse)
+            .collect(Collectors.toList());
+    }
+    
+    public Page<RestaurantResponse> findByCityWithPagination(String city, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return restaurantRepository.findByCity(city, pageable)
+            .map(this::mapToResponse);
+    }
+    
+    public Page<RestaurantResponse> findByCityAndStateWithPagination(String city, String state, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return restaurantRepository.findByCityAndState(city, state, pageable)
+            .map(this::mapToResponse);
+    }
+    
+    public Page<RestaurantResponse> findOpenRestaurantsWithPagination(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return restaurantRepository.findByIsOpenTrue(pageable)
+            .map(this::mapToResponse);
     }
     
     private RestaurantResponse mapToResponse(Restaurant restaurant) {
