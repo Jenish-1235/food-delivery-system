@@ -3,6 +3,9 @@ package org.example.fooddeliverysystem.model;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -27,58 +30,60 @@ public class Restaurant {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    
+
     @ManyToOne
     @JoinColumn(name = "user_id", unique = true, nullable = false)
     @NotNull(message = "User is required")
     private User user;
-    
+
     @Column(nullable = false)
     @NotBlank(message = "Restaurant name is required")
     private String restaurantName;
-    
+
     @Column(nullable = false)
     @NotBlank(message = "City is required")
     private String city;
-    
+
     @Column(nullable = false)
     @NotBlank(message = "State is required")
     private String state;
-    
+
     @Column(nullable = false)
     @NotBlank(message = "Zip code is required")
     private String zipCode;
-    
+
     @Column(nullable = false)
     @NotNull(message = "Latitude is required")
     private Double latitude;
-    
+
     @Column(nullable = false)
     @NotNull(message = "Longitude is required")
     private Double longitude;
-    
+
     private LocalTime openingTime;
-    
+
     private LocalTime closingTime;
-    
+
     private String imgUrl;
-    
+
     @Column(nullable = false)
     private boolean isOpen = true;
-    
+
     @Column(columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     private String metadata;
-    
+
     @CreatedDate
     private LocalDateTime createdAt;
-    
+
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public Restaurant() {}
+    public Restaurant() {
+    }
 
-    public Restaurant(User user, String restaurantName, String city, String state, 
-                     String zipCode, Double latitude, Double longitude) {
+    public Restaurant(User user, String restaurantName, String city, String state,
+            String zipCode, Double latitude, Double longitude) {
         this.user = user;
         this.restaurantName = restaurantName;
         this.city = city;
@@ -88,9 +93,9 @@ public class Restaurant {
         this.longitude = longitude;
     }
 
-    public Restaurant(User user, String restaurantName, String city, String state, 
-                     String zipCode, Double latitude, Double longitude, LocalTime openingTime, 
-                     LocalTime closingTime, String imgUrl, boolean isOpen, String metadata) {
+    public Restaurant(User user, String restaurantName, String city, String state,
+            String zipCode, Double latitude, Double longitude, LocalTime openingTime,
+            LocalTime closingTime, String imgUrl, boolean isOpen, String metadata) {
         this.user = user;
         this.restaurantName = restaurantName;
         this.city = city;
@@ -225,4 +230,3 @@ public class Restaurant {
         this.updatedAt = updatedAt;
     }
 }
-

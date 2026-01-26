@@ -3,6 +3,9 @@ package org.example.fooddeliverysystem.model;
 import java.time.LocalDateTime;
 
 import org.example.fooddeliverysystem.enums.Role;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -29,42 +32,42 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    
+
     @Column(unique = true, nullable = false)
     @NotBlank(message = "Phone number is required")
     @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be 10 digits")
     private String phoneNo;
-    
+
     @Email(message = "Email should be valid")
     @Column(unique = true, nullable = false)
     private String email;
-    
+
     @Column(nullable = false)
     @NotBlank(message = "Password is required")
     @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
-    
+
     @NotBlank(message = "Name is required")
     private String name;
     private String address;
-    
+
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
-    
+
     private boolean enabled = true;
-    
+
     @Column(columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     private String metadata;
-    
+
     @CreatedDate
     private LocalDateTime createdAt;
-    
+
     @LastModifiedDate
     private LocalDateTime updatedAt;
-    
 
-    public User(){}
-    
+    public User() {
+    }
 
     public User(String phoneNo, String email, String password, String name, String address, Role role) {
         this.phoneNo = phoneNo;
@@ -75,7 +78,8 @@ public class User {
         this.role = role;
     }
 
-    public User(String phoneNo, String email, String password, String name, String address, Role role, boolean enabled, String metadata, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public User(String phoneNo, String email, String password, String name, String address, Role role, boolean enabled,
+            String metadata, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.phoneNo = phoneNo;
         this.email = email;
         this.password = password;
@@ -88,7 +92,6 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
-    
     public String getId() {
         return id;
     }
@@ -108,7 +111,7 @@ public class User {
     public String getName() {
         return name;
     }
-    
+
     public String getAddress() {
         return address;
     }
@@ -128,7 +131,7 @@ public class User {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
-    
+
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
@@ -136,7 +139,7 @@ public class User {
     public void setId(String id) {
         this.id = id;
     }
-    
+
     public void setPhoneNo(String phoneNo) {
         this.phoneNo = phoneNo;
     }

@@ -39,7 +39,7 @@ services:
     restart: unless-stopped
 
   kafka:
-    image: confluentinc/cp-kafka:7.3.0
+    image: confluentinc/cp-kafka:7.8.0
     container_name: food-delivery-kafka
     depends_on:
       zookeeper:
@@ -54,6 +54,7 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_JVM_PERFORMANCE_OPTS: "-Dcom.sun.management.jmxremote=false"
     healthcheck:
       test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:29092 || exit 1"]
       interval: 15s

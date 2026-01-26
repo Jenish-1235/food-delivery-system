@@ -3,6 +3,9 @@ package org.example.fooddeliverysystem.model;
 import java.time.LocalDateTime;
 
 import org.example.fooddeliverysystem.enums.OrderStatus;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -30,68 +33,70 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    
+
     @Column(unique = true, nullable = false)
     @NotBlank(message = "Order number is required")
     private String orderNumber;
-    
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     @NotNull(message = "User is required")
     private User user;
-    
+
     @ManyToOne
     @JoinColumn(name = "restaurant_id", nullable = false)
     @NotNull(message = "Restaurant is required")
     private Restaurant restaurant;
-    
+
     @ManyToOne
     @JoinColumn(name = "driver_id")
     private Driver driver;
-    
+
     @Column(columnDefinition = "jsonb", nullable = false)
     @NotBlank(message = "Items JSON is required")
     private String itemsJson;
-    
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Order status is required")
     private OrderStatus orderStatus;
-    
+
     @Column(nullable = false)
     @NotBlank(message = "Address is required")
     private String address;
-    
+
     @Column(nullable = false)
     @NotNull(message = "Latitude is required")
     private Double latitude;
-    
+
     @Column(nullable = false)
     @NotNull(message = "Longitude is required")
     private Double longitude;
-    
+
     @Column(nullable = false)
     @NotNull(message = "Amount is required")
     @Min(value = 0, message = "Amount must be non-negative")
     private Double amount;
-    
+
     @CreatedDate
     @Column(nullable = false)
     private LocalDateTime createdAt;
-    
+
     private LocalDateTime deliveredAt;
-    
+
     @LastModifiedDate
     private LocalDateTime updatedAt;
-    
+
     @Column(columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     private String metadata;
 
-    public Order() {}
+    public Order() {
+    }
 
-    public Order(String orderNumber, User user, Restaurant restaurant, String itemsJson, 
-                OrderStatus orderStatus, String address, Double latitude, Double longitude, 
-                Double amount) {
+    public Order(String orderNumber, User user, Restaurant restaurant, String itemsJson,
+            OrderStatus orderStatus, String address, Double latitude, Double longitude,
+            Double amount) {
         this.orderNumber = orderNumber;
         this.user = user;
         this.restaurant = restaurant;
@@ -223,4 +228,3 @@ public class Order {
         this.metadata = metadata;
     }
 }
-

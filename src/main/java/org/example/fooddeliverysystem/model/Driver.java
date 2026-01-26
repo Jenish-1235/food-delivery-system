@@ -2,6 +2,9 @@ package org.example.fooddeliverysystem.model;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -26,33 +29,35 @@ public class Driver {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    
+
     @OneToOne
     @JoinColumn(name = "user_id", unique = true, nullable = false)
     @NotNull(message = "User is required")
     private User user;
-    
+
     @Column(nullable = false)
     @NotBlank(message = "License number is required")
     private String licenseNumber;
-    
+
     @Column(nullable = false)
     @NotBlank(message = "Vehicle number is required")
     private String vehicleNumber;
-   
+
     @Column(nullable = false)
     private boolean onLeave = false;
-    
+
     @Column(columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     private String metadata;
-    
+
     @CreatedDate
     private LocalDateTime createdAt;
-    
+
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public Driver() {}
+    public Driver() {
+    }
 
     public Driver(User user, String licenseNumber, String vehicleNumber) {
         this.user = user;
@@ -131,4 +136,3 @@ public class Driver {
         this.updatedAt = updatedAt;
     }
 }
-
