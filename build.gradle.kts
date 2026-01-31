@@ -35,6 +35,7 @@ dependencies {
 	implementation("com.bucket4j:bucket4j-redis:8.10.0")
 	implementation("org.springframework.boot:spring-boot-starter-kafka")
 	implementation("org.apache.kafka:kafka-streams")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 	developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 	implementation("io.micrometer:micrometer-registry-prometheus")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")

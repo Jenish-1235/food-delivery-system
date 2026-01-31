@@ -53,6 +53,7 @@ public class Order {
     private Driver driver;
 
     @Column(columnDefinition = "jsonb", nullable = false)
+    @JdbcTypeCode(SqlTypes.JSON)
     @NotBlank(message = "Items JSON is required")
     private String itemsJson;
 
